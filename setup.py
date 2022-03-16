@@ -10,9 +10,12 @@ python setup.py install
 
 from setuptools import setup
 
+with open('requirements.txt', encoding='utf8') as f:
+    required = f.read().splitlines()
+
 setup(name='local_stats',
       version='0.0.1',
-      license='Closed source idk',
+      license='MIT License',
       description='A python package for using local statistics to cluster " + \
           "significant signal in scientific images.',
       author='Richard Brearton',
@@ -29,5 +32,6 @@ setup(name='local_stats',
           'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
           'Programming Language :: Python :: Implementation :: CPython',
-      ]
+      ],
+      install_requires=required
       )
