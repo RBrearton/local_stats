@@ -204,6 +204,56 @@ class Image:
             mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = 1
         return mask
 
+    def cluster(self,
+                signal_length_scale: int,
+                bkg_length_scale: int,
+                n_sigma: float = 4,
+                significance_mask: np.ndarray = None) -> List[Cluster]:
+        """
+        Returns the clustered significant pixels. Does significance calculations
+        here under the hood.
+
+        Args:
+            signal_length_scale:
+                The length scale over which signal is present. This is usually
+                just a few pixels for typical magnetic diffraction data.
+            bkg_length_scale:
+                The length scale over which background level varies in a CCD
+                image. If your CCD is perfect, you can set this to the number
+                of pixels in a detector, but larger numbers will run more
+                slowly. Typically something like 1/10th of the number of pixels
+                in your detector is probably sensible.
+            n_sigma:
+                The number of standard deviations above the mean that a pixel
+                needs to be to be considered significant.
+            significance_mask:
+                Pixels that should never be considered to be statistically
+                significant (useful if, for example, stats are biased in this
+                region due to a physical barrier like a beamstop).
+        """
+        # Do the significance calculation.
+        significant_pixels = self._significant_pixels(
+            signal_length_scale, bkg_length_scale, n_sigma, significance_mask)
+        # Get the significant pixels.
+        pixels_y, pixels_x = np.where(significant_pixels == 1)
+
+        # Massage these pixels into the form that sklearn wants to see.
+        pixel_coords = np.zeros((len(pixels_x), 2))
+        pixel_coords[:, 0] = pixels_x
+        pixel_coords[:, 1] = pixels_y
+
+        # If there are no significant pixels, return an empty list.
+        if len(pixel_coords) == 0:
+            return []
+
+        # Run the DBSCAN algorithm, setting eps and min_samples according to our
+        # expected signal_length_scale.
+        dbscan = DBSCAN(
+            eps=signal_length_scale, min_samples=signal_length_scale**2
+        ).fit(pixel_coords)
+
+        return Cluster.from_DBSCAN(pixel_coords, dbscan.labels_)
+
 
 class DiffractionImage(Image):
     """
