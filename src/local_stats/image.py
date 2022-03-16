@@ -2,10 +2,14 @@
 Stores the Image class, and its subclasses.
 """
 
-from typing import Tuple
+from typing import List, Tuple
 
 import numpy as np
 import pywt
+from scipy.ndimage import uniform_filter, gaussian_filter
+from sklearn.cluster import DBSCAN
+
+from .cluster import Cluster
 
 
 def _wavelet_freqs_below_length_scale(length_scale: int, wavelet_type: str):
@@ -119,6 +123,87 @@ class Image:
         # Invert the wavelet transformation.
         self.image_array = pywt.waverec(coeffs, wavelet_choice)
 
+    def _significance_levels(self, signal_length_scale: int,
+                             bkg_length_scale: int) -> np.ndarray:
+        """
+        Returns an image of the local significance level of every pixel in the
+        image.
+
+        TODO: this should be replaced by optimized numpy extension function.
+
+        Args:
+            signal_length_scale:
+                The length scale over which signal is present. This is usually
+                just a few pixels for typical magnetic diffraction data.
+            bkg_length_scale:
+                The length scale over which background level varies in a CCD
+                image. If your CCD is perfect, you can set this to the number
+                of pixels in a detector, but larger numbers will run more
+                slowly. Typically something like 1/10th of the number of pixels
+                in your detector is probably sensible.
+
+        Returns:
+            Array of standard deviations between the mean and each pixel.
+        """
+        # Compute local statistics.
+        local_signal = gaussian_filter(
+            self.image_array, int(signal_length_scale/3))
+        local_bkg_levels = uniform_filter(local_signal, bkg_length_scale)
+        local_deviation = np.std(local_signal)
+
+        return np.abs((local_signal - local_bkg_levels)/local_deviation)
+
+    def _significant_pixels(self, signal_length_scale: int,
+                            bkg_length_scale: int,
+                            n_sigma: float = 4,
+                            significance_mask: np.ndarray = None) -> None:
+        """
+        Returns a significance map of the pixels in self.data.
+
+        Args:
+            signal_length_scale:
+                The length scale over which signal is present. This is usually
+                just a few pixels for typical magnetic diffraction data.
+            bkg_length_scale:
+                The length scale over which background level varies in a CCD
+                image. If your CCD is perfect, you can set this to the number
+                of pixels in a detector, but larger numbers will run more
+                slowly. Typically something like 1/10th of the number of pixels
+                in your detector is probably sensible.
+            n_sigma:
+                The number of standard deviations above the mean that a pixel
+                needs to be to be considered significant.
+        """
+        # Compute significance; return masked significance. Significant iff
+        # pixel is more than 4stddevs larger than the local average.
+        significant_pixels = np.where(self._significance_levels(
+            signal_length_scale, bkg_length_scale) > n_sigma, 1, 0)
+
+        # If a mask was provided, use it.
+        if significance_mask is not None:
+            return significant_pixels*significance_mask
+        return significant_pixels
+
+    def mask_from_clusters(self, clusters: List[Cluster]) -> np.ndarray:
+        """
+        Generates a mask array from clusters.
+
+        Args:
+            clusters:
+                A list of the cluster objects that we'll use to generate our
+                mask.
+
+        Returns:
+            A boolean numpy mask array.
+        """
+        # Make an array of zeros of the correct size for this image; every
+        # pixel is a mask by default.
+        mask = np.zeros_like(self.image_array)
+
+        for cluster in clusters:
+            mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = 1
+        return mask
+
 
 class DiffractionImage(Image):
     """
@@ -129,3 +214,47 @@ class DiffractionImage(Image):
                  beam_centre: Tuple[int]) -> None:
         super().__init__(image_array)
         self.beam_centre = beam_centre
+
+    @property
+    def _pixel_dx(self):
+        """
+        Returns the horizontal distance between each pixel and the beamstop.
+        """
+        horizontal_x = np.arange(0, self.image_array.shape[1])
+        horizontal_dx = horizontal_x - self.beam_centre[0]
+        pixel_dx = np.zeros_like(self.image_array)
+        for col in range(self.image_array.shape[1]):
+            pixel_dx[:, col] = horizontal_dx[col]
+
+        return pixel_dx
+
+    @property
+    def _pixel_dy(self):
+        """
+        Returns the vertical distance between each pixel and the beamstop.
+        """
+        vertical_y = np.arange(self.image_array.shape[0]-1, -1, -1)
+        vertical_dy = vertical_y - (
+            self.image_array.shape[0] - 1 - self.beam_centre[1]
+        )
+        pixel_dy = np.zeros_like(self.image_array)
+        for row in range(self.image_array.shape[0]):
+            pixel_dy[row, :] = vertical_dy[row]
+
+        return pixel_dy
+
+    @property
+    def pixel_radius(self):
+        """
+        Returns each pixel's radial distance from the beam centre, in units of
+        pixels.
+        """
+        return np.sqrt(np.square(self._pixel_dx) + np.square(self._pixel_dy))
+
+    @property
+    def pixel_chi(self):
+        """
+        Returns each pixel's azimuthal rotation for a polar coordinate mapping.
+        This is equivalent to the typical diffraction motor chi.
+        """
+        return np.arctan2(self._pixel_dx, self._pixel_dy)
