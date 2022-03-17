@@ -1,4 +1,4 @@
-name: Pylint
+name: pytest
 
 on: [push]
 
@@ -21,4 +21,4 @@ jobs:
           pip install -e .
       - name: Analysing the code with pylint
         run: |
-          pytest
+          pylint $(git ls-files '*.py')
