@@ -1,5 +1,5 @@
 [![codecov](https://codecov.io/gh/RBrearton/local_stats/branch/master/graph/badge.svg?token=FGIV0MVHS8)](https://codecov.io/gh/RBrearton/local_stats)
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FRBrearton%2Flocal_stats%2Fbadge&style=flat)](https://actions-badge.atrox.dev/RBrearton/local_stats/goto)
+[![Actions Status](https://github.com/RBrearton/local_stats/workflows/pytest/badge.svg)](https://github.com/pytest/local_stats/actions)
 
 A python package for using local statistics to cluster significant signal in
 scientific images.
