@@ -8,3 +8,4 @@ dist
 settings.json
 .coveragecoc
 .ds_store
+coverage.xml
