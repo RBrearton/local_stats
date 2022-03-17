@@ -2,3 +2,5 @@ pillow
 scipy
 scikit-learn
 pywavelets
+pytest
+pylint
