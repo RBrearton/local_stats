@@ -22,5 +22,6 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install -e .
           coverage run -m pytest
+          coverage xml
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v2
