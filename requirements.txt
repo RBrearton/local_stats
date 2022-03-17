@@ -4,3 +4,4 @@ scikit-learn
 pywavelets
 pytest
 pylint
+coverage

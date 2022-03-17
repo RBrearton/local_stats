@@ -6,3 +6,5 @@ dist
 *egg*/
 .coverage
 settings.json
+.coveragecoc
+.ds_store

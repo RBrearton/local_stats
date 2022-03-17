@@ -1,4 +1,4 @@
-name: Pylint
+name: CodeCov
 
 on: [push, pull_request]
 
@@ -9,16 +9,18 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: checkout@v2
+        with:
+          fetch-depth: "2"
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@master
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Generate Report
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install -e .
-      - name: Analysing the code with pylint
-        run: |
-          pytest
+          coverage run pytest
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
