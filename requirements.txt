@@ -5,3 +5,4 @@ pywavelets
 pytest
 pylint
 coverage
+pytest-cov
