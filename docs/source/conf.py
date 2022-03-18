@@ -129,11 +129,11 @@ todo_include_todos = True
 
 
 def setup(app):
-    app.add_css_file('custom.css')
+    # app.add_css_file('custom.css')
+    pass
 
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
-    'pandas': ('https://pandas.pydata.org/docs/', None)
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None)
 }
