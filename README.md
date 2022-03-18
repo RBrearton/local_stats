@@ -8,9 +8,21 @@
 A python package for using local statistics to cluster significant signal in
 scientific images.
 
+Documentation can be found [here](https://local-stats.readthedocs.io/en/latest/?badge=latest).
+
+To install, simply use
+
+```bash
+pip install local_stats
+```
+
 To install in developer mode:
 
+```bash
+git clone https://github.com/RBrearton/local_stats
+cd local_stats
 pip install -e .
+```
 
 Alternatively, the usual "python setup.py install" etc. will work, but
-installation with pip has obvious upsides (easier to manage etc.).
+installation of dev mode with pip has obvious upsides (easier to manage etc.).
