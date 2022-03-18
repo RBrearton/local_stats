@@ -5,9 +5,8 @@ Configuration file for the Sphinx documentation builder.
 import os
 import sys
 
-# Apparently helps RTD.
-sys.path.append(os.path.abspath('../..'))
-sys.path.append(os.path.abspath('..'))
+# Allow RTD to import local_stats without actually building it.
+sys.path.append(os.path.abspath('../../src'))
 
 # These are all sphynx's fault, not mine!
 # pylint: disable=redefined-builtin
@@ -129,9 +128,8 @@ todo_include_todos = True
 #html_theme_options = {"logo_only": True}
 
 
-# def setup(app):
-#     # app.add_css_file('custom.css')
-#     pass
+def setup(app):
+    app.add_css_file('custom.css')
 
 
 # Looks for objects in external projects
