@@ -1,3 +1,5 @@
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/RBrearton/local_stats.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RBrearton/local_stats/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/RBrearton/local_stats.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/RBrearton/local_stats/context:python)
 [![codecov](https://codecov.io/gh/RBrearton/local_stats/branch/master/graph/badge.svg?token=FGIV0MVHS8)](https://codecov.io/gh/RBrearton/local_stats)
 [![Actions Status](https://github.com/RBrearton/local_stats/workflows/pytest/badge.svg)](https://github.com/pytest/local_stats/actions)
 
