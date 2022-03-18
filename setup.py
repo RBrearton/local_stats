@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(
     name='local_stats',
-    version='0.0.4',
+    version='0.0.5',
     license='MIT License',
     description=(
         "A python package for using local statistics to cluster " +

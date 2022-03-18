@@ -19,7 +19,7 @@ project = 'local_stats'
 copyright = '2022, Richard Brearton'
 author = 'Richard Brearton'
 
-version = '0.0.4'
+version = '0.0.5'
 # The full version, including alpha/beta/rc tags
 release = version
 
