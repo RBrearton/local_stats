@@ -8,12 +8,13 @@ Otherwise, just:
 python setup.py install
 """
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='local_stats',
-    version='0.0.5',
+    version='0.0.7',
     license='MIT License',
+    packages=find_packages('src'),
     description=(
         "A python package for using local statistics to cluster " +
         "significant signal in scientific images."),
