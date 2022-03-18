@@ -2,6 +2,13 @@
 Configuration file for the Sphinx documentation builder.
 """
 
+import os
+import sys
+
+# Apparently helps RTD.
+sys.path.append(os.path.abspath('../..'))
+sys.path.append(os.path.abspath('..'))
+
 # These are all sphynx's fault, not mine!
 # pylint: disable=redefined-builtin
 # pylint: disable=invalid-name
