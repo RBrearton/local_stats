@@ -6,3 +6,6 @@ pytest
 pylint
 coverage
 pytest-cov
+nbsphinx
+jupyter_sphinx
+sphinx-rtd-theme
