@@ -10,9 +10,6 @@ python setup.py install
 
 from setuptools import setup
 
-with open('requirements.txt', encoding='utf8') as f:
-    required = f.read().splitlines()
-
 setup(name='local_stats',
       version='0.0.1',
       license='MIT License',
@@ -22,7 +19,6 @@ setup(name='local_stats',
       author_email='richardbrearton@gmail.com',
       package_dir={'': 'src'},
       include_package_data=True,
-      zip_safe=False,
       classifiers=[
           'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
@@ -33,5 +29,9 @@ setup(name='local_stats',
           'Programming Language :: Python :: 3.10',
           'Programming Language :: Python :: Implementation :: CPython',
       ],
-      install_requires=required
+      # The bare minimum for installation.
+      install_requires=["pillow >= 9.0.1",
+                        "scipy >= 1.8.0",
+                        "scikit-learn >= 1.0.2",
+                        "pywavelets >= 1.3.0"]
       )
