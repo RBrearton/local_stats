@@ -22,8 +22,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     classifiers=[
-        'Intended Audience :: Developers',
-        'Intended Audience :: Scientific community',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Operating System :: Unix',
         'Operating System :: POSIX',
