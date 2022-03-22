@@ -5,6 +5,7 @@ Stores the Image class, and its subclasses.
 from typing import List, Tuple
 
 import numpy as np
+from PIL import Image as PILImage
 import pywt
 from scipy.ndimage import uniform_filter, gaussian_filter
 from sklearn.cluster import DBSCAN
@@ -23,7 +24,7 @@ def _wavelet_freqs_below_length_scale(length_scale: int, wavelet_type: str):
             "like a different wavelet type, please raise an issue on the " +
             "local_stats github page.")
     # Wavelet length scales increase by powers of 2.
-    return np.floor(np.log2(length_scale))
+    return int(np.floor(np.log2(length_scale)))
 
 
 class Image:
@@ -38,6 +39,21 @@ class Image:
     def __init__(self, image_array: np.ndarray) -> None:
         self.image_array = image_array
 
+    @classmethod
+    def from_file(cls, path_to_file: str):
+        """
+        Instantiates an image from a path to a data file that can be opened
+        using PIL.Image.open().
+
+        Args:
+            path_to_file:
+                The path to the image file of interest.
+
+        Returns:
+            An instance of Image.
+        """
+        return cls(np.array(PILImage.open(path_to_file)).astype(np.float64))
+
     def subtract_background(self, background_array: np.ndarray,
                             zero_clip=True) -> None:
         """
@@ -49,10 +65,14 @@ class Image:
         Args:
             background_array:
                 A numpy array representing the background to be subtracted.
+                OR
+                An instance of Image representing the background.
             zero_clip:
                 Boolean determining if the background subtracted image_array
                 should be clipped at 0.
         """
+        if isinstance(background_array, type(self)):
+            background_array = background_array.image_array
         self.image_array -= background_array
         if zero_clip:
             self.image_array = np.clip(self.image_array, 0, np.inf)
@@ -263,7 +283,9 @@ class DiffractionImage(Image):
     def __init__(self, image_array: np.ndarray,
                  beam_centre: Tuple[int]) -> None:
         super().__init__(image_array)
+        raise NotImplementedError()
         self.beam_centre = beam_centre
+
 
     @property
     def _pixel_dx(self):
