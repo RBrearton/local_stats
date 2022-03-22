@@ -12,7 +12,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='local_stats',
-    version='0.1.0',
+    version='0.1.1',
     license='MIT License',
     packages=find_packages('src'),
     description=(
