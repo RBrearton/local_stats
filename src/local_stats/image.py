@@ -228,7 +228,8 @@ class Image:
                 signal_length_scale: int,
                 bkg_length_scale: int,
                 n_sigma: float = 4,
-                significance_mask: np.ndarray = None) -> List[Cluster]:
+                significance_mask: np.ndarray = None,
+                frac_pixels_needed: float = 1/np.pi) -> List[Cluster]:
         """
         Returns the clustered significant pixels. Does significance calculations
         here under the hood.
@@ -250,6 +251,11 @@ class Image:
                 Pixels that should never be considered to be statistically
                 significant (useful if, for example, stats are biased in this
                 region due to a physical barrier like a beamstop).
+            frac_pixels_needed:
+                The fraction of pixels within a distance of signal_length_scale
+                of a pixel that need to also be statistically significant for
+                the clustering algorithm to class that pixel as being a core
+                point in a cluster. Defaults to 1/pi.
         """
         # Do the significance calculation.
         significant_pixels = self._significant_pixels(
@@ -269,7 +275,8 @@ class Image:
         # Run the DBSCAN algorithm, setting eps and min_samples according to our
         # expected signal_length_scale.
         dbscan = DBSCAN(
-            eps=signal_length_scale, min_samples=signal_length_scale**2
+            eps=signal_length_scale,
+            min_samples=frac_pixels_needed*np.pi*signal_length_scale**2
         ).fit(pixel_coords)
 
         return Cluster.from_DBSCAN(pixel_coords, dbscan.labels_)
@@ -285,7 +292,6 @@ class DiffractionImage(Image):
         super().__init__(image_array)
         raise NotImplementedError()
         self.beam_centre = beam_centre
-
 
     @property
     def _pixel_dx(self):
