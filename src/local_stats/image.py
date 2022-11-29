@@ -78,7 +78,7 @@ class Image:
             self.image_array = np.clip(self.image_array, 0, np.inf)
 
     def wavelet_denoise(self,
-                        signal_length_scale: 20,
+                        signal_length_scale: int = 20,
                         cutoff_factor: float = 0.2,
                         max_cutoff_factor: float = 0.8,
                         wavelet_choice: str = "sym4") -> None:
@@ -194,7 +194,7 @@ class Image:
                 The number of standard deviations above the mean that a pixel
                 needs to be to be considered significant.
         """
-        # Compute significance; return masked significance. Significant iff
+        # Compute significance; return masked significance. Significant if
         # pixel is more than 4stddevs larger than the local average.
         significant_pixels = np.where(self._significance_levels(
             signal_length_scale, bkg_length_scale) > n_sigma, 1, 0)
