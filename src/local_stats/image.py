@@ -197,11 +197,11 @@ class Image:
         # Compute significance; return masked significance. Significant if
         # pixel is more than 4stddevs larger than the local average.
         significant_pixels = np.where(self._significance_levels(
-            signal_length_scale, bkg_length_scale) > n_sigma, 1, 0)
+            signal_length_scale, bkg_length_scale) > n_sigma, True, False)
 
         # If a mask was provided, use it.
         if significance_mask is not None:
-            return significant_pixels*significance_mask
+            return np.logical_and(significant_pixels,significance_mask)
         return significant_pixels
 
     def mask_from_clusters(self, clusters: List[Cluster]) -> np.ndarray:
@@ -218,10 +218,10 @@ class Image:
         """
         # Make an array of zeros of the correct size for this image; every
         # pixel is a mask by default.
-        mask = np.zeros_like(self.image_array)
+        mask = np.full_like(self.image_array,False)
 
         for cluster in clusters:
-            mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = 1
+            mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = True
         return mask
 
     def cluster(self,
