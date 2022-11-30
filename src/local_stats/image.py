@@ -78,7 +78,7 @@ class Image:
             self.image_array = np.clip(self.image_array, 0, np.inf)
 
     def wavelet_denoise(self,
-                        signal_length_scale: 20,
+                        signal_length_scale: int = 20,
                         cutoff_factor: float = 0.2,
                         max_cutoff_factor: float = 0.8,
                         wavelet_choice: str = "sym4") -> None:
@@ -194,14 +194,14 @@ class Image:
                 The number of standard deviations above the mean that a pixel
                 needs to be to be considered significant.
         """
-        # Compute significance; return masked significance. Significant iff
+        # Compute significance; return masked significance. Significant if
         # pixel is more than 4stddevs larger than the local average.
         significant_pixels = np.where(self._significance_levels(
-            signal_length_scale, bkg_length_scale) > n_sigma, 1, 0)
+            signal_length_scale, bkg_length_scale) > n_sigma, True, False)
 
         # If a mask was provided, use it.
         if significance_mask is not None:
-            return significant_pixels*significance_mask
+            return np.logical_and(significant_pixels,significance_mask)
         return significant_pixels
 
     def mask_from_clusters(self, clusters: List[Cluster]) -> np.ndarray:
@@ -218,10 +218,10 @@ class Image:
         """
         # Make an array of zeros of the correct size for this image; every
         # pixel is a mask by default.
-        mask = np.zeros_like(self.image_array)
+        mask = np.full_like(self.image_array,False)
 
         for cluster in clusters:
-            mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = 1
+            mask[cluster.pixel_indices[1], cluster.pixel_indices[0]] = True
         return mask
 
     def cluster(self,
@@ -261,7 +261,7 @@ class Image:
         significant_pixels = self._significant_pixels(
             signal_length_scale, bkg_length_scale, n_sigma, significance_mask)
         # Get the significant pixels.
-        pixels_y, pixels_x = np.where(significant_pixels == 1)
+        pixels_y, pixels_x = np.where(significant_pixels == True)
 
         # Massage these pixels into the form that sklearn wants to see.
         pixel_coords = np.zeros((len(pixels_x), 2))
