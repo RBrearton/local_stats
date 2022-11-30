@@ -261,7 +261,7 @@ class Image:
         significant_pixels = self._significant_pixels(
             signal_length_scale, bkg_length_scale, n_sigma, significance_mask)
         # Get the significant pixels.
-        pixels_y, pixels_x = np.where(significant_pixels == 1)
+        pixels_y, pixels_x = np.where(significant_pixels == True)
 
         # Massage these pixels into the form that sklearn wants to see.
         pixel_coords = np.zeros((len(pixels_x), 2))
